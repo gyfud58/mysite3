@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load sales_filter %}
+{% block content %}
+<div class="container my-3">
+    <!-- 사용자 오류 표시 -->
+    {% if messages %}
+        <div class="alert alert-danger my-3" role="alert">
+            {% for message in messages %}
+                <strong>{{ message.tags }}</strong>
+                <ul><li>{{ message.message }}</li></ul>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <h5 class="border-bottom py-2">{{ question.hcode }}</h5> <!-- 재목 -->
+    <!-- 질문 추천 버튼 만들기 -->
+    <div class="row my-3">
+        <div class="col-11"> <!-- 질문 영역 -->
+            <!-- 기존 내용 start -->
+            <div class="card"> <!-- my-3 삭제 -->
+                <div class="card-body">
+                    <div class="card-text">{{ question.hcode|mark }}</div> <!-- markdown 적용 -->
+                    
+                    <!-- 제보이미지 보여주기 start -->
+                    <div>
+                    {% if question.upload_imgfile %}
+                        <div class="container border col-10">
+                            <div style="width:10%; height:150px; float:left; margin-right:10px;">
+                                <img src="{{ question.upload_imgfile.url }}" width="400">
+                            </div>
+                        </div>
+                    {% endif %}
+                    </div>
+                    <!-- 제보이미지 보여주기 end -->
+
+                    <br></br>
+                    <p></p>
+                    <br></br>
+
+                    <div class="d-flex justify-content-end">
+                        <div class="badge badge-light p-2 text-left">
+                            <div class="mb-2">{{ question.author.username }}</div>
+                            <div>{{ question.create_date }}</div>
+                            <!-- 질문 삭제 버튼 추가하기 : 로그인한 사용자와 글쓴이가 같은 경우에만 -->
+                            {% if request.user == question.author %}
+                            <div class="my-3">
+                                <a href="#" class="delete btn btn-sm btn-outline-secondary right"
+                                    data-uri="{% url 'sales:question_delete' question.id %}">삭제</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 기존 내용 end -->
+            
+            </div>
+        </div>
+    </h5>
+    {% for answer in question.answer_set.all %}
+    <a name="answer_{{ answer.id }}"></a> <!-- 앵커 엘리먼트 추가 -->
+
+    <!-- 답변 추천 버튼 만들기 -->
+    <div class="row my-3">
+        <div class="col-11"> <!-- 답변 영역 -->
+            <!-- 기존 내용 start -->
+            <div class="card"> <!-- my-3 삭제 -->
+                <div class="card-body">
+                    <div class="card-text">{{ answer.hcode|mark }}</div> <!-- markdown 적용 -->
+
+                    <!-- 분석이미지 보여주기 start -->
+                    <div>
+                        {% if answer.predicted_imgfile %}
+                            <div class="container border col-10">
+                                <div style="width:10%; height:150px; float:left; margin-right:10px;">
+                                    <img src="{{ answer.predicted_imgfile.url }}" width="400">
+                                </div>
+                            </div>
+                        {% endif %}
+                        </div>
+                    <!-- 분석이미지 보여주기 end -->
+
+                    <br></br>
+                    <p></p>
+                    <br></br>
+
+                    <div class="d-flex justify-content-end">
+                        <div class="badge badge-light p-2 text-left">
+                            <div class="mb-2">{{ answer.author.username }}</div>
+                            <div>{{ question.create_date }}</div>
+                            {% if request.user == answer.author %}
+                            <div class="my-3">
+                                <a href="#" class="delete btn btn-sm btn-outline-secondary"
+                                    data-uri="{% url 'sales:answer_delete' answer.id %}">삭제</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 기존 내용 end -->
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $(".delete").on('click', function() {
+            if(confirm("정말로 삭제하시겠습니까?")) {
+                location.href = $(this).data('uri');
+            }
+        });     
+    });
+</script>
+{% endblock %}

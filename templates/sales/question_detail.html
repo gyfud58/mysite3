@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <!-- 사용자 오류 표시 -->
+    {% if messages %}
+        <div class="alert alert-danger my-3" role="alert">
+            {% for message in messages %}
+                <strong>{{ message.tags }}</strong>
+                <ul><li>{{ message.message }}</li></ul>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <h2 class="border-bottom py-2"> <strong>넙치 ID : {{ question.hcode }}</strong></h2>
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text">
+                <div>
+                    {% if question.upload_imgfile == '' or question.upload_imgfile == null %}
+                    {% else %}
+                    <tr>
+                        <td colspan="2"><img src="{{ question.upload_imgfile.url }}"
+                                             style="max-width:400px"></td>
+                    </tr>
+                    {% endif %}
+                </div>
+                <div id="text1">
+                    <strong> 근무자명 : {{ question.wname }} </strong>
+                </div>
+                <div id="text2">
+                    <strong> 근무지역 : {{ question.wplace }} </strong>
+                </div>
+                <div id="text3">
+                    <strong> 항구명 : {{ question.port }} </strong>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+        {% if question.modify_date %}
+        <div class="badge badge-light p-2 text-left mx-3">
+            <div class="mb-2">modified at</div>
+            <div>{{ question.modify_date }}</div>
+        </div>
+        {% endif %}
+        <div class="badge badge-light p-2 text-left">
+            <div class="mb-2">{{ question.author.username }}</div>
+            {{ question.create_date|date }}
+        </div>
+        </div>
+        {% if request.user == question.author %}
+        <div class="my-3">
+            <a href="{% url 'sales:question_modify' question.id %}"
+               class="btn btn-sm btn-outline-secondary">수정</a>
+            <a href="#" class="delete btn btn-sm btn-outline-secondary"
+               data-uri="{% url 'sales:question_delete' question.id %}">삭제</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <h2 class="border-bottom my-3 py-2">
+        <strong>{{ question.answer_set.count }}개의 답변이 있습니다.</strong>
+    </h2>
+
+
+    {% for answer in question.answer_set.all %}
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text">
+                <div>
+                    {% if answer.predicted_image %}
+                        <div class="container border col-10">
+                            <div style="width:10%; height:150px; float:left; margin-right:10px;">
+                                <img src="{{ answer.predicted_imgfile.url }}" width:"400px">
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div id="text1">
+                    <strong> 손상 여부 결과 : {{ answer.damage_result }} </strong>
+                </div>
+                <div id="text2">
+                    <strong> 근무자명 : {{ answer.wname }} </strong>
+                </div>
+                <div id="text3">
+                    <strong> 근무지역 : {{ answer.wplace }} </strong>
+                </div>
+                <div id="text4">
+                    <strong> 항구명 : {{ answer.port }} </strong>
+                </div>
+            </div>
+            {% if request.user == answer.author %}
+            <div class="my-3">
+                <a href="{% url 'sales:answer_modify' answer.id %}"
+                   class="btn btn-sm btn-outline-secondary">수정</a>
+                <a href="#" class="delete btn btn-sm btn-outline-secondary"
+                   data-uri="{% url 'sales:answer_delete' answer.id %}">삭제</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="d-flex justify-content-end">
+            {% if question.modify_date %}
+            <div class="badge badge-light p-2 text-left mx-3">
+                <div class="mb-2">modified at</div>
+                <div>{{ question.modify_date }}</div>
+            </div>
+            {% endif %}
+            <div class="badge badge-light p-2 text-left">
+                <div class="mb-2">{{ answer.author.username }}</div>
+                {{ answer.create_date|date }}
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+    <form action="{% url 'sales:answer_create' question.id %}"
+          method="post" class="my-3">
+        {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+        {% for field in form %}
+            {% if field.errors %}
+            <strong>{{ field.label }}</strong>
+            {{ field.errors }}
+            {% endif %}
+        {% endfor %}
+        </div>
+        {% endif %}
+        <a href="{% url 'sales:answer_create' question.id %}" class="btn btn-primary"
+           style="background-color:#02075D; color:#ffffff">
+            답변 등록
+        </a>
+    </form>
+</div>
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".delete").on('click', function() {
+        if(confirm("정말로 삭제하시겠습니까?")) {
+            location.href = $(this).data('uri');
+        }
+    });
+});
+</script>
+{% endblock %}
