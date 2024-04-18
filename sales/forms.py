@@ -10,9 +10,9 @@ class QuestionForm(forms.ModelForm):
         #     'content':forms.Textarea(attrs={'class':'from-control','rows':10}),
         # }
         labels={
-            'wname':'근무자명',
-            'wplace' : '근무지역',
-            'port' : '항구명',
+            'wname':'이용자',
+            'wplace' : '지역',
+            'port' : '건물',
             'upload_imgfile' : '이미지',
         }
 
@@ -22,5 +22,5 @@ class AnswerForm(forms.ModelForm):
         fields=['predicted_imgfile','damage_result']
         labels={
             'predicted_imgfile':'이미지',
-            'damage_result':'손상 여부 결과'
+            'damage_result':'인원 수'
         }

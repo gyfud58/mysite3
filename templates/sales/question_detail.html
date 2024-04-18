@@ -10,7 +10,7 @@
             {% endfor %}
         </div>
     {% endif %}
-    <h2 class="border-bottom py-2"> <strong>넙치 ID : {{ question.hcode }}</strong></h2>
+    <h2 class="border-bottom py-2"> <strong>사람 ID : {{ question.hcode }}</strong></h2>
     <div class="card my-3">
         <div class="card-body">
             <div class="card-text">
@@ -24,13 +24,13 @@
                     {% endif %}
                 </div>
                 <div id="text1">
-                    <strong> 근무자명 : {{ question.wname }} </strong>
+                    <strong> 이용자 : {{ question.wname }} </strong>
                 </div>
                 <div id="text2">
-                    <strong> 근무지역 : {{ question.wplace }} </strong>
+                    <strong> 지역 : {{ question.wplace }} </strong>
                 </div>
                 <div id="text3">
-                    <strong> 항구명 : {{ question.port }} </strong>
+                    <strong> 건물명 : {{ question.port }} </strong>
                 </div>
             </div>
         </div>
@@ -66,28 +66,25 @@
         <div class="card-body">
             <div class="card-text">
                 <div>
-                    {% if answer.predicted_image %}
-                        <div class="container border col-10">
-                            <div style="width:10%; height:150px; float:left; margin-right:10px;">
-                                <img src="{{ answer.predicted_imgfile.url }}" width:"400px">
-                            </div>
-                        </div>
+                    {% if answer.predicted_imgfile == '' or answer.predicted_imgfile == null %}
+                    {% else %}
+                    <tr>
+                        <td colspan="2"><img src="{{ answer.predicted_imgfile.url }}"
+                                             style="max-width:400px"></td>
+                    </tr>
                     {% endif %}
                 </div>
                 <div id="text1">
-                    <strong> 손상 여부 결과 : {{ answer.damage_result }} </strong>
+                    <strong> 인원수 : {{ answer.damage_result }} </strong>
                 </div>
                 <div id="text2">
-                    <strong> 근무자명 : {{ answer.wname }} </strong>
+                    <strong> 인원수 : {{ answer.wname }} </strong>
                 </div>
-                <div id="text3">
-                    <strong> 근무지역 : {{ answer.wplace }} </strong>
-                </div>
-                <div id="text4">
-                    <strong> 항구명 : {{ answer.port }} </strong>
-                </div>
+                <!-- <div id="text3">
+                    <strong> 인원 : {{ answer.wplace }} </strong>
+                </div> -->
             </div>
-            {% if request.user == answer.author %}
+            {% if request.user.is_superuser %} <!--수정과 삭제를 관리자 권한으로 변경-->
             <div class="my-3">
                 <a href="{% url 'sales:answer_modify' answer.id %}"
                    class="btn btn-sm btn-outline-secondary">수정</a>
@@ -124,10 +121,10 @@
         {% endfor %}
         </div>
         {% endif %}
-        <a href="{% url 'sales:answer_create' question.id %}" class="btn btn-primary"
+        <!-- <a href="{% url 'sales:answer_create' question.id %}" class="btn btn-primary"
            style="background-color:#02075D; color:#ffffff">
             답변 등록
-        </a>
+        </a> -->
     </form>
 </div>
 {% endblock %}

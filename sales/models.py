@@ -15,7 +15,7 @@ class Question(models.Model):
                              related_name='author_question')
 
     create_date = models.DateTimeField()
-    modify_date = models.DateTimeField(null=True, blank=True)
+    modify_date = models.DateTimeField(null=True, blank=True) # Null,blank = True를 기재하지 않아서 인자가 전달되지 않을 수 있다.
     upload_imgfile = models.ImageField(upload_to="question/%Y%m%d", max_length=500,
                                        null=True, blank=True)
 
@@ -27,7 +27,7 @@ class Question(models.Model):
         self.save()
 
 class Answer(models.Model):
-    damage_result=models.TextField()
+    damage_result=models.TextField(null=True, blank=True)
 
     wname = models.TextField(max_length=20)
     wplace = models.TextField(max_length=20)

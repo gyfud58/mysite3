@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-    <h5 class="my-3 border-bottom pb-2">넙치정보등록</h5>
+    <h5 class="my-3 border-bottom pb-2">밀집도 정보등록</h5>
     <form method="post" class="post-form my-3" enctype="multipart/form-data">
         {% csrf_token %}
         <!-- 오류 표시 Start-->
@@ -17,17 +17,17 @@
         {% endif %}
         <!-- 오류 표시 End -->
         <div class="form-group">
-            <label for="wname"><strong>근무자명 :</strong></label>
+            <label for="wname"><strong>이용자 :</strong></label>
             <input type="text" class="form-control" name="wname" id="wname"
                 value="{{ form.wname.value|default_if_none:'' }}">
         </div>
         <div class="form-group">
-            <label for="wplace"><strong>근무지역 :</strong></label>
+            <label for="wplace"><strong>지역 :</strong></label>
             <textarea class="form-control" name="wplace" id="wplace"
                       rows="1">{{ form.wplace.value|default_if_none:'' }}</textarea>
         </div>
         <div class="form-group">
-            <label for="port"><strong>항구명 :</strong></label>
+            <label for="port"><strong>건물명 :</strong></label>
             <textarea class="form-control" name="port" id="port"
                       rows="1">{{ form.port.value|default_if_none:'' }}</textarea>
         </div>
@@ -39,7 +39,7 @@
         </div>
         <button type="submit" class="btn btn-primary"
                 style="background-color:#02075D; color:#ffffff;
-                margin-block: 15px;">넙치 정보 저장</button>
+                margin-block: 15px;">정보 저장</button>
     </form>
 </div>
 {% endblock %}

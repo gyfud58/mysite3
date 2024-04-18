@@ -27,11 +27,11 @@
     <table class="table">
         <thead>
         <tr class="text-center" style="background-color:#02075D; color:#ffffff">
-            <th>넙치ID</th>
-            <th>근무자명</th>
+            <th>ID</th>
+            <th>이용자</th>
 {#            <th style="width:50%">제목</th>#}
-            <th>근무지역</th>
-            <th>항구명</th>
+            <th>지역</th>
+            <th>건물명</th>
             <th>작성일자</th>
             <th>사용자 ID</th>
             <th>이미지</th>
@@ -125,7 +125,7 @@
     <!-- 페이징 처리 끝 -->
     <a href="{% url 'sales:question_create' %}" class="btn btn-primary"
        style="background-color:#02075D; color:#ffffff">
-        넙치 정보 등록
+        정보 등록
     </a>
 </div>
 <form id="searchForm" method="get" action="{% url 'index' %}">

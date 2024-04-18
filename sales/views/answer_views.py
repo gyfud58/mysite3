@@ -19,12 +19,11 @@ def answer_create(request, question_id, result_mesg, out_file): # 인자가 어�
         if form.is_valid():           
             answer=form.save(commit=False) # create_date가 지정될 때까지 임시저장
             answer.damage_result=result_mesg
-            answer.predicted_imgfile=out_file            
+            answer.predicted_imgfile=out_file
             answer.author=request.user # 추가한 속성 author 적용
             answer.create_date=timezone.now()
             answer.question=question
             answer.save()
-
             return redirect('sales:detail', question_id=question.id)
     else:
         form=AnswerForm()
@@ -53,7 +52,7 @@ def answer_modify(request, answer_id):
     else:
         form = AnswerForm(instance=answer)
     context={'answer':answer,'form':form}
-    return render(request,'sales/answer_form.html',context)
+    return render(request,'sales/question_form.html',context)
 
 @login_required(login_url = 'common:login')
 def answer_delete(request,answer_id):

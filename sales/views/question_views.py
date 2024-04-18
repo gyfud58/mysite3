@@ -3,9 +3,9 @@ from django.contrib.auth.decorators import login_required # @login_required 애�
 from django.shortcuts import render, get_object_or_404, redirect 
 from django.utils import timezone # 현재시간 timezone.now() 사용하기 위해
 
-from ..forms import QuestionForm
 from ..models import Question
-from .answer_views import *  # 답변 자동 생성을 위해
+from ..forms import QuestionForm
+from .answer_views import *
 
 import os
 import ultralytics # YOLO 라이브러리 import
@@ -39,7 +39,7 @@ def count_objects(results, target_classes):
         if object_counts[i] >= 1 :
             total_counts += object_counts[i]
 
-    return object_counts[0],total_counts # person, 전체 건수
+    return object_counts[3],total_counts # [halibut]마리, 전체 건수
 
 # 이미지에 counter 넣기 함수
 def plot_counter1(img, text1): # text 1 줄만 넣기
@@ -65,17 +65,21 @@ def plot_counter1(img, text1): # text 1 줄만 넣기
     cv2.putText(img,text1,org1,font,fontScale,color,thickness,cv2.LINE_AA)
 
     # 이미지 출력해보자
-    cv2.imshow('Image', img) # colab 이외 환경 (vscode, jupyter notebook 등)
+    # cv2.imshow('Image', img) # colab 이외 환경 (vscode, jupyter notebook 등)
 
 # 추론/예측 함수
 def yolo_predict(filename, user):
 
     source_path = './media/' + str(filename) # 경로 포함 파일이름
     predict_dir = './media/answer/'
+
     source_file = os.path.split(source_path)[1] # 순수 파일이름만
     predict_file = timezone.now().strftime("%Y%m%d") # %H%M
+    
     out_file = predict_dir + predict_file + '/' + source_file
+    # print
     predict_image_url = 'answer/' + predict_file + '/' + source_file
+    # print(장고에는 answer부터 있어야 한다) * 미디어부터 있으면 장고가 인식을 못한다
 
     choice = False
 
@@ -84,24 +88,25 @@ def yolo_predict(filename, user):
 
     else : # 전이학습 : YOLOv8 pretrained 모델 지정
         # pretrained_model = 'C:/projects/crowds/YOLOv8/best.pt'
-        pretrained_model = './media/weights/best_damage_seg.pt'
+        pretrained_model = './media/weights/best_30.pt'
         yolo_model = YOLO(pretrained_model) # 전이학습용
 
     # predict 예측/추론하기
     results = yolo_model.predict(source=source_path, conf=0.30,save=True,
                                  project=predict_dir, name=predict_file, 
                                  exist_ok=True, seed=0, show_conf=False)
-    
+
     # object detection 결과 : person, 전체 건수 계산
-    person_count, total_counts = count_objects(results, yolo_model.names)
-    
+    halibut_count, total_counts = count_objects(results, yolo_model.names)
+
     # 이미지에 person 건수 쓰기
     cv2_image = cv2.imread(out_file)
-    out_text1 = f'      [{person_count}] persons' # 이미지에 출력
+    out_text1 = f'      [{halibut_count}] halibut' # 이미지에 출력
     plot_counter1(cv2_image, out_text1)
     cv2.imwrite(out_file, cv2_image)
 
-    result_mesg = f'YOLOv8 분석 내용 : [{person_count}] 마리'
+    # result_mesg = f'YOLOv8 분석 내용 : [{halibut_count}] 명'
+    result_mesg = f'[{halibut_count}] 명'
     return result_mesg, predict_image_url
 
 @login_required(login_url='common:login')
@@ -145,15 +150,15 @@ def question_create(request):
             question.save()
 
             # ======= YOLOv8 predict() 후에 답변을 자동 생성할까? ========== 
-           
-        if (question.upload_imgfile.size > 0) : # 파일이 정상적으로 업로드 되었는 지
-            out_file, result_mesg = yolo_predict(question.upload_imgfile, request.user)
+
+        # if (question.upload_imgfile.size > 0) : # 파일이 정상적으로 업로드 되었는 지
+            result_mesg, out_file = yolo_predict(question.upload_imgfile, request.user)
             # print(type(result_mesg))
             # print(type(out_file))
             # img=cv2.imread('example.jpg', cv2.IMREAD_COLOR)
             # print("이미지의 데이터 타입:", img.dtype)
             # print("이미지의 형태:", img.shape)
-            
+
             answer_create(request, question.id, result_mesg, out_file) ### result_mesg, predict_image_url 반환 지점
 
             return redirect('sales:index')
